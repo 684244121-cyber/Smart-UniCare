@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart UniCare - Digital Student Hub</title>
+    <style>
+        :root { --blue: #1A73E8; --cyan: #4FC3F7; --orange: #FF5722; --bg: #F4F7F9; }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--bg); }
+        nav { background: var(--blue); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 800px; margin: 20px auto; padding: 0 20px; }
+        
+        /* ส่วน Demo สำหรับเปลี่ยนวัน */
+        .demo-bar { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #ddd; display: flex; gap: 10px; align-items: center; justify-content: center; }
+        select { padding: 8px; border-radius: 5px; border: 1px solid var(--blue); font-family: 'Sarabun'; }
+
+        .day-label { background: var(--blue); color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 8px solid var(--cyan); }
+        .status-badge { background: #E3F2FD; color: var(--blue); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .urgent { background: #FBE9E7; color: var(--orange); animation: flash 1.5s infinite; }
+        @keyframes flash { 50% { opacity: 0.5; } }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .btn { padding: 18px; border-radius: 10px; text-align: center; text-decoration: none; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div style="font-weight: bold; font-size: 1.3rem;">Smart UniCare</div>
+    <div id="liveDate" style="font-size: 0.9rem;"></div>
+</nav>
+
+<div class="container">
+    <!-- แถบเลือกวันเพื่อ Demo ตารางที่เปลี่ยนไปทุกวัน -->
+    <div class="demo-bar">
+        <label>📅 <b>เลือกวันเพื่อ Demo:</b></label>
+        <select id="daySelect" onchange="updateUI(this.value)">
+            <option value="1">วันจันทร์</option>
+            <option value="2">วันอังคาร</option>
+            <option value="3">วันพุธ</option>
+            <option value="4">วันพฤหัสบดี</option>
+            <option value="5">วันศุกร์</option>
+        </select>
+        <button onclick="triggerAlert()" style="cursor:pointer; padding: 5px 10px; border-radius: 5px; background: #eee;">🚨 จำลองเปลี่ยนห้อง</button>
+    </div>
+
+    <div id="dayBox" class="day-label">วันนี้</div>
+    
+    <h3 style="color: var(--blue);">🗓️ ตารางเรียนอัจฉริยะ (Smart Schedule)</h3>
+    <div id="schedule">
+        <!-- ข้อมูลจะถูกใส่ที่นี่ด้วย JavaScript -->
+    </div>
+
+    <div class="btn-group">
+        <a href="chatbot.html" class="btn" style="background: var(--cyan);">💬 AI Chatbot 24/7</a>
+        <a href="emergency.html" class="btn" style="background: var(--orange);">🚨 แจ้งเหตุฉุกเฉิน</a>
+    </div>
+</div>
+
+<script>
+    // ข้อมูลตารางเรียนจริงจากแหล่งข้อมูล [1]
+    const scheduleData = {
+        1: [{ n: "การเขียนโปรแกรมบนเว็บ", t: "ดร.สุกัญญา บุญมาธรรม", time: "08:30-12:30", r: "26505-26201" }],
+        2: [
+            { n: "หลักการและการโปรแกรมเชิงวัตถุ", t: "ดร.พีรศุษย์ บุญมาธรรม", time: "08:30-12:30", r: "26505-26201" },
+            { n: "ระบบฐานข้อมูล", t: "อาจารย์ศิริพร อ่วมศิริ", time: "13:30-17:30", r: "26201-26505" }
+        ],
+        3: [], // วันพุธไม่มีเรียนตามตาราง [1]
+        4: [
+            { n: "สถิติและการแปลงข้อมูลเป็นภาพ", t: "ผศ.ปิณนี แก้วสวัสดิ์", time: "08:30-12:30", r: "26505-26201" },
+            { n: "ภาษาไทยเพื่อการสื่อสารเชิงบูรณาการ", t: "ผศ.ดร.อรรถวิทย์ รอดเจริญ", time: "13:30-16:30", r: "33508" }
+        ],
+        5: [
+            { n: "สถาปัตยกรรมและองค์ประกอบคอมพิวเตอร์", t: "ดร.ชนัดร์นาถ วิเชียรประดิษฐ์", time: "08:30-12:30", r: "26201-26505" },
+            { n: "สุขภาพเพื่อชีวิตในยุคดิจิทัล", t: "ผศ.พัชชนก ปานวิเชียร", time: "13:30-16:30", r: "SU-403" }
+        ]
+    };
+
+    const daysName = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+
+    function updateUI(day) {
+        const container = document.getElementById('schedule');
+        const subjects = scheduleData[day] || [];
+        document.getElementById('dayBox').innerText = "ตารางเรียนสำหรับ วัน" + daysName[day];
+        
+        if (subjects.length === 0) {
+            container.innerHTML = '<div class="card" style="text-align:center; color:#999;">🎉 วันนี้ไม่มีเรียนตามตาราง</div>';
+        } else {
+            container.innerHTML = subjects.map((s, i) => `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>${s.n}</strong>
+                        <span id="st-${i}" class="status-badge">ปกติ</span>
+                    </div>
+                    <div style="font-size:0.9rem; color:#666; margin:5px 0;">อาจารย์: ${s.t}</div>
+                    <div style="color:var(--blue); font-size:0.9rem; font-weight:bold;">⏱ ${s.time} | <span id="rm-${i}">📍 ห้อง: ${s.r}</span></div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // ฟังก์ชันจำลองแจ้งเปลี่ยนห้องเพื่อแก้ปัญหาการสื่อสารล่าช้า [4]
+    function triggerAlert() {
+        const st = document.getElementById('st-0');
+        const rm = document.getElementById('rm-0');
+        if(st && rm) {
+            st.innerText = "⚠️ เปลี่ยนห้องกะทันหัน!";
+            st.classList.add('urgent');
+            rm.innerHTML = "📍 ห้อง: <b>ONLINE (Zoom)</b>";
+            alert("Smart Notification: มีการแจ้งอัปเดตห้องเรียนใหม่ทันที!");
+        }
+    }
+
+    window.onload = () => {
+        const today = new Date().getDay();
+        const initialDay = (today === 0 || today === 6) ? 1 : today;
+        document.getElementById('daySelect').value = initialDay;
+        document.getElementById('liveDate').innerText = new Date().toLocaleDateString('th-TH', { dateStyle: 'long' });
+        updateUI(initialDay);
+    };
+</script>
+</body>
+</html>

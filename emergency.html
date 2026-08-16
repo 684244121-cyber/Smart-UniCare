@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart UniCare - Emergency</title>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background: #F4F7F9; padding: 20px; }
+        .form-card { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-em { background: #FF5722; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div style="text-align:center; margin-bottom:10px;"><a href="index.html">⬅ กลับหน้าหลัก</a></div>
+    <div class="form-card">
+        <h2 style="color:#FF5722; margin:0;">🚨 แจ้งเหตุฉุกเฉิน</h2>
+        <p style="font-size:0.9rem; color:#666;">แจ้งปัญหาไฟดับ น้ำรั่ว ลิฟต์เสีย เพื่อการแก้ไขที่รวดเร็ว</p>
+        <form onsubmit="alert('ส่งข้อมูลแจ้งเหตุสำเร็จ! ฝ่ายอาคารกำลังรับเรื่อง'); return false;">
+            <label>ประเภทปัญหา</label>
+            <select><option>ไฟดับ</option><option>น้ำรั่ว</option><option>ลิฟต์เสีย</option></select>
+            <label>สถานที่ (ตึก/ห้อง)</label>
+            <input type="text" placeholder="เช่น ตึก 26 ห้อง 26201" required>
+            <label>รายละเอียด</label>
+            <textarea rows="3"></textarea>
+            <button class="btn-em">ส่งข้อมูลแจ้งเหตุทันที</button>
+        </form>
+    </div>
+</body>
+</html>
