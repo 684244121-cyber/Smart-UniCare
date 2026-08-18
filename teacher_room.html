@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart UniCare - Teacher Room Change</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background: #F0F4F8; padding: 20px; }
+        .card { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { color: #1A73E8; margin-top: 0; text-align: center; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #444; }
+        select, input { width: 100%; padding: 12px; border: 2px solid #E1E4E8; border-radius: 10px; margin-top: 5px; font-size: 1rem; font-family: 'Sarabun', sans-serif; }
+        .btn-update { background: #1A73E8; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 1.1rem; cursor: pointer; margin-top: 25px; font-weight: bold; transition: 0.3s; }
+        .btn-update:hover { background: #1557B0; transform: translateY(-2px); }
+        .status-box { background: #E8F0FE; padding: 15px; border-radius: 10px; margin-top: 20px; display: none; border-left: 5px solid #1A73E8; }
+    </style>
+</head>
+<body>
+    <div style="text-align:center; margin-bottom:15px;"><a href="index.html" style="text-decoration:none; color:#666;">⬅ กลับหน้าหลัก</a></div>
+    
+    <div class="card">
+        <h2>🏫 เปลี่ยนห้องเรียน/สถานะ</h2>
+        <p style="text-align:center; color:#666;">สำหรับอาจารย์ผู้สอน แจ้งเปลี่ยนห้องเรียนกะทันหัน</p>
+        
+        <form id="roomForm">
+            <label>ชื่ออาจารย์</label>
+            <input type="text" placeholder="ระบุชื่อ-นามสกุล" required>
+
+            <label>วิชาที่สอน</label>
+            <input type="text" placeholder="รหัสวิชา หรือ ชื่อวิชา" required>
+
+            <label>เลือกอาคาร</label>
+            <select id="building" onchange="updateRooms()">
+                <option value="">-- เลือกอาคาร --</option>
+                <option value="อาคาร 26">อาคาร 26</option>
+                <option value="อาคาร 33">อาคาร 33</option>
+                <option value="SU">SU</option>
+            </select>
+
+            <label>เลือกห้องใหม่</label>
+            <select id="room">
+                <option value="">-- เลือกห้อง --</option>
+            </select>
+
+            <button type="button" class="btn-update" onclick="submitChange()">อัปเดตข้อมูลการใช้ห้อง</button>
+        </form>
+
+        <div id="statusResult" class="status-box">
+            <strong>✅ อัปเดตสำเร็จ!</strong><br>
+            <span id="displayText"></span>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลห้องจำลอง
+        const roomData = {
+            "อาคาร 26": ["26201", "26202", "26501", "26502"],
+            "อาคาร 33": ["33508"],
+            "SU": ["401", "402", "403"]
+        };
+
+        function updateRooms() {
+            const building = document.getElementById('building').value;
+            const roomSelect = document.getElementById('room');
+            roomSelect.innerHTML = '<option value="">-- เลือกห้อง --</option>';
+            
+            if(building && roomData[building]) {
+                roomData[building].forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r;
+                    option.textContent = r;
+                    roomSelect.appendChild(option);
+                });
+            }
+        }
+
+        function submitChange() {
+            const building = document.getElementById('building').value;
+            const room = document.getElementById('room').value;
+            if(!building || !room) {
+                alert("กรุณาเลือกอาคารและห้อง");
+                return;
+            }
+            
+            const resultBox = document.getElementById('statusResult');
+            const displayText = document.getElementById('displayText');
+            displayText.innerText = `ย้ายการสอนไปที่: ${building} ห้อง ${room}`;
+            resultBox.style.display = 'block';
+            
+            alert("ระบบได้แจ้งให้นักศึกษาในรายวิชาทราบแล้ว (Mockup)");
+        }
+    </script>
+</body>
+</html>
